@@ -31,11 +31,11 @@ const Stripe = () => {
     });
 
     const data = await res.json();
-    console.log("data",data)
     if (data.alreadySubscribed) {
       alert(`You are already subscribed to the ${data.plan} plan.`);
       return;
     }
+    console.log("data",data.url)
     window.location.href = data.url;
   };
 
