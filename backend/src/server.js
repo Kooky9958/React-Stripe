@@ -82,7 +82,8 @@ app.post("/api/upgrade-subscription", async (req, res) => {
     }
     const updatedSubscription = await stripe.subscriptions.update(subscription.id, {
       items: [{ id: subscription.items.data[0].id, price: newPriceId }],
-      proration_behavior: "none",
+      proration_behavior: "create_prorations", // immediately attempt charge to user 
+      payment_behavior: "error_if_incomplete", // ensure subscription is only update if payment is successful
     });
 
     res.json({ success: true, message: "Subscription upgraded successfully!", subscription: updatedSubscription });
