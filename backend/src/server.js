@@ -61,18 +61,16 @@ app.post("/api/create-checkout-session", async (req, res) => {
   }
 });
 
-
 app.post("/api/upgrade-subscription", async (req, res) => {
   try {
-    const { email, newPriceId } = req.body;
-    
+    const { email, priceId } = req.body;
     const customers = await stripe.customers.list({ email });
     if (!customers.data.length) {
       return res.status(400).json({ error: "Customer not found" });
     }
     const customer = customers.data[0];
 
-    const subscriptions = await stripe.subscriptions.list({ customer: customer.id, status: "active" });
+    const subscriptions = await stripe.subscriptions.list({ customer: customer.id });
     if (!subscriptions.data.length) {
       return res.status(400).json({ error: "No active subscription found" });
     }
@@ -82,7 +80,6 @@ app.post("/api/upgrade-subscription", async (req, res) => {
     if (currentPriceId === newPriceId) {
       return res.status(400).json({ error: "You're already on this plan!" });
     }
-
     const updatedSubscription = await stripe.subscriptions.update(subscription.id, {
       items: [{ id: subscription.items.data[0].id, price: newPriceId }],
       proration_behavior: "create_prorations", // immediately attempt charge to user 
